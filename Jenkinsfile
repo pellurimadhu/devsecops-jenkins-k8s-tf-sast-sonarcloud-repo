@@ -16,6 +16,27 @@ pipeline {
 					sh 'mvn snyk:test -fn'
 				}
 			}
-    }		
+    }
+
+	stage('Build') { 
+            steps { 
+               withDockerRegistry([credentialsId: "dockerlogin", url: ""]) {
+                 script{
+                 app =  docker.build("madhusecurity")
+                 }
+               }
+            }
+    }
+
+	stage('Push') {
+            steps {
+                script{
+                    docker.withRegistry('https://010438505047.dkr.ecr.us-east-1.amazonaws.com/madhusecurity', 'ecr:us-east-1:aws-credentials') {
+                    app.push("latest")
+                    }
+                }
+            }
+    	}
+	    
   }
 }
